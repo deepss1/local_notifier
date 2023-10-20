@@ -50,7 +50,7 @@ class LocalNotifier {
       } else if (call.method == 'onLocalNotificationClick') {
         listener.onLocalNotificationClick(localNotification!);
       } else if (call.method == 'onLocalNotificationClickAction') {
-        int actionIndex = call.arguments['actionIndex'];
+        int actionIndex = Platform.isMacOS ? 0 : call.arguments['actionIndex'];
         listener.onLocalNotificationClickAction(
           localNotification!,
           actionIndex,
