@@ -75,10 +75,19 @@ public class LocalNotifierPlugin: NSObject, FlutterPlugin, NSUserNotificationCen
         }
         result(true)
     }
-    
+
     public func userNotificationCenter(_ center: NSUserNotificationCenter, didActivate notification: NSUserNotification) {
-        _invokeMethod("onLocalNotificationClick", notification.identifier!)
+        switch notification.activationType {
+        case .actionButtonClicked:
+            _invokeMethod("onLocalNotificationClickAction", notification.identifier!)
+        default:
+            _invokeMethod("onLocalNotificationClick", notification.identifier!)
+        }
     }
+
+    /* public func userNotificationCenter(_ center: NSUserNotificationCenter, didActivate notification: NSUserNotification) {
+        _invokeMethod("onLocalNotificationClick", notification.identifier!)
+    } */
     
     public func userNotificationCenter(_ center: NSUserNotificationCenter, didDeliver notification: NSUserNotification) {
         _invokeMethod("onLocalNotificationShow", notification.identifier!)
