@@ -1,22 +1,24 @@
 import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
-import 'package:flutter/material.dart' hide MenuItem;
-import 'package:preference_list/preference_list.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> with TrayListener {
   LocalNotification? _exampleNotification = LocalNotification(
     identifier: '_exampleNotification',
-    title: "example",
-    body: "hello flutter!",
+    title: 'example',
+    body: 'hello flutter!',
     actions: [
       LocalNotificationAction(
         text: 'Yes',
@@ -27,7 +29,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     ],
   );
 
-  List<LocalNotification> _notificationList = [];
+  final List<LocalNotification> _notificationList = [];
 
   @override
   void initState() {
@@ -37,7 +39,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _initTray();
 
     _exampleNotification?.onShow = () {
-      print('onShow ${_exampleNotification?.identifier}');
+      if (kDebugMode) {
+        print('onShow ${_exampleNotification?.identifier}');
+      }
     };
     _exampleNotification?.onClose = (closeReason) {
       switch (closeReason) {
@@ -50,23 +54,29 @@ class _HomePageState extends State<HomePage> with TrayListener {
         default:
       }
       String log = 'onClose ${_exampleNotification?.identifier} - $closeReason';
-      print(log);
+      if (kDebugMode) {
+        print(log);
+      }
       BotToast.showText(text: log);
     };
     _exampleNotification?.onClick = () {
       String log = 'onClick ${_exampleNotification?.identifier}';
-      print(log);
+      if (kDebugMode) {
+        print(log);
+      }
       BotToast.showText(text: log);
     };
     _exampleNotification?.onClickAction = (actionIndex) {
       String log =
           'onClickAction ${_exampleNotification?.identifier} - $actionIndex';
-      print(log);
+      if (kDebugMode) {
+        print(log);
+      }
       BotToast.showText(text: log);
     };
   }
 
-  void _initTray() async {
+  Future<void> _initTray() async {
     await trayManager.setIcon(
       Platform.isWindows
           ? 'images/tray_icon_original.ico'
@@ -116,18 +126,24 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   _handleNewLocalNotification() async {
     LocalNotification notification = LocalNotification(
-      title: "example - ${_notificationList.length}",
-      subtitle: "local_notifier_example",
-      body: "hello flutter!",
+      title: 'example - ${_notificationList.length}',
+      subtitle: 'local_notifier_example',
+      body: 'hello flutter!',
     );
     notification.onShow = () {
-      print('onShow ${notification.identifier}');
+      if (kDebugMode) {
+        print('onShow ${notification.identifier}');
+      }
     };
     notification.onClose = (closeReason) {
-      print('onClose ${notification.identifier} - $closeReason');
+      if (kDebugMode) {
+        print('onClose ${notification.identifier} - $closeReason');
+      }
     };
     notification.onClick = () {
-      print('onClick ${notification.identifier}');
+      if (kDebugMode) {
+        print('onClick ${notification.identifier}');
+      }
     };
 
     _notificationList.add(notification);
@@ -136,29 +152,33 @@ class _HomePageState extends State<HomePage> with TrayListener {
   }
 
   Widget _buildBody(BuildContext context) {
-    return PreferenceList(
+    return ListView(
       children: <Widget>[
-        PreferenceListSection(
+        Column(
           children: [
-            PreferenceListItem(
-              title: Text('New a notification'),
+            ListTile(
+              title: const Text('New a notification'),
               onTap: _handleNewLocalNotification,
             ),
           ],
         ),
-        PreferenceListSection(
-          title: Text('${_exampleNotification?.identifier}'),
+        Column(
           children: [
-            PreferenceListItem(
-              title: Text('show'),
+            Row(
+              children: [
+                Text('${_exampleNotification?.identifier}'),
+              ],
+            ),
+            ListTile(
+              title: const Text('show'),
               onTap: () => _exampleNotification?.show(),
             ),
-            PreferenceListItem(
-              title: Text('close'),
+            ListTile(
+              title: const Text('close'),
               onTap: () => _exampleNotification?.close(),
             ),
-            PreferenceListItem(
-              title: Text('destroy'),
+            ListTile(
+              title: const Text('destroy'),
               onTap: () async {
                 await _exampleNotification?.destroy();
                 _exampleNotification = null;
@@ -168,15 +188,19 @@ class _HomePageState extends State<HomePage> with TrayListener {
           ],
         ),
         for (var notification in _notificationList)
-          PreferenceListSection(
-            title: Text('${notification.identifier}'),
+          Column(
             children: [
-              PreferenceListItem(
-                title: Text('show'),
+              Row(
+                children: [
+                  Text(notification.identifier),
+                ],
+              ),
+              ListTile(
+                title: const Text('show'),
                 onTap: () => notification.show(),
               ),
-              PreferenceListItem(
-                title: Text('close'),
+              ListTile(
+                title: const Text('close'),
                 onTap: () => notification.close(),
               ),
             ],
